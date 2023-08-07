@@ -1,9 +1,11 @@
 package ca.sxxxi.titter.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -41,8 +44,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import ca.sxxxi.titter.data.models.Comment
 import ca.sxxxi.titter.data.models.CommentReplyPage
+import ca.sxxxi.titter.data.utils.states.Status
 import ca.sxxxi.titter.ui.components.IndentedItem
 import ca.sxxxi.titter.ui.components.PostCard
+import ca.sxxxi.titter.ui.components.PostCardWithoutButtons
+import ca.sxxxi.titter.ui.components.TextInput
 import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,10 +56,22 @@ import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
 fun CommentsScreen(
 	uiState: CommentsViewModel.CommentsUiState,
 	onBackPressed: () -> Unit = {},
-	repliesLoader: (String, Map<String, List<CommentReplyPage>>, Int) -> Unit
+	repliesLoader: (String, Map<String, List<CommentReplyPage>>, Int) -> Unit,
+	onCommentEdit: (String) -> Unit,
+	onCommentAdd: () -> Unit
 ) {
 	val comments = uiState.comments.collectAsLazyPagingItems()
-	Column {
+
+	LaunchedEffect(key1 = uiState.commentCreateStatus) {
+		if (uiState.commentCreateStatus is Status.Success) {
+			comments.refresh()
+			onCommentEdit("")
+		}
+	}
+
+	Column(
+		modifier = Modifier.fillMaxSize()
+	) {
 		TopAppBar(
 			title = { Text(text = "Comments") },
 			colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = Color.Transparent),
@@ -64,7 +82,7 @@ fun CommentsScreen(
 			}
 		)
 		uiState.post?.let {
-			PostCard(post = it)
+			PostCardWithoutButtons(post = it)
 		}
 		Column(
 			modifier = Modifier
@@ -77,23 +95,68 @@ fun CommentsScreen(
 			)
 			Divider()
 		}
-		CommentsList(
-			comments = comments,
-			repliesStore = uiState.commentRepliesStore,
-			repliesLoader = { commentId ->
-				repliesLoader(
-					commentId,
-					uiState.commentRepliesStore,
-					2
-				)
-			}
+
+		Column(modifier = Modifier.weight(1f)) {
+			CommentsList(
+				modifier = Modifier.height(50.dp),
+				comments = comments,
+				repliesStore = uiState.commentRepliesStore,
+				repliesLoader = { commentId ->
+					repliesLoader(
+						commentId,
+						uiState.commentRepliesStore,
+						2
+					)
+				}
+			)
+		}
+		CommentTextBox(
+			comment = uiState.commentCreateForm?.content ?: "",
+			onCommentEdit = onCommentEdit,
+			onCommentAdd = onCommentAdd,
+			commentStatus = uiState.commentCreateStatus
 		)
+	}
+}
+
+@Composable
+fun CommentTextBox(
+	modifier: Modifier = Modifier,
+	comment: String,
+	onCommentAdd: () -> Unit = {},
+	onCommentEdit: (String) -> Unit,
+	commentStatus: Status
+) {
+	val bg = when (commentStatus) {
+		is Status.Failure -> MaterialTheme.colorScheme.error
+		else -> MaterialTheme.colorScheme.surfaceVariant
+	}
+
+	Row(
+		modifier = Modifier
+			.background(bg)
+			.then(modifier),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		TextInput(
+			modifier = Modifier.weight(1f),
+			value = comment,
+			onValueChange = onCommentEdit,
+		)
+		if (commentStatus is Status.Loading) {
+			CircularProgressIndicator()
+		} else {
+			IconButton(onClick = onCommentAdd) {
+				Icon(imageVector = Icons.Default.Send, contentDescription = null)
+			}
+		}
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CommentsList(
+	modifier: Modifier = Modifier,
 	comments: LazyPagingItems<Comment>,
 	repliesStore: Map<String, List<CommentReplyPage>>,
 	repliesLoader: (String) -> Unit
@@ -111,13 +174,13 @@ private fun CommentsList(
 	}
 
 	Scaffold(
-		modifier = Modifier.fillMaxSize(),
+//		modifier = Modifier.then(modifier),
 		snackbarHost = {
 			SnackbarHost(hostState = snackBarHostState)
 		}
 	) { scaffoldPadding ->
 		Column(
-			modifier = Modifier.fillMaxSize(),
+//			modifier = Modifier.fillMaxSize(),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
@@ -126,7 +189,7 @@ private fun CommentsList(
 					LazyColumn(
 						modifier = Modifier
 							.padding(scaffoldPadding)
-							.fillMaxSize()
+//							.fillMaxSize()
 					) {
 						commentNodes(
 							comments = comments.itemSnapshotList.items,

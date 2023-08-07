@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,11 +51,6 @@ fun PostCard(
 	Column(
 		modifier = modifier
 			.padding(horizontal = 8.dp, vertical = 4.dp)
-//			.border(
-//				width = 1.dp,
-//				brush = SolidColor(MaterialTheme.colorScheme.outlineVariant),
-//				shape = RoundedCornerShape(8)
-//			)
 			.clip(RoundedCornerShape(8))
 	) {
 		Column(
@@ -78,6 +74,32 @@ fun PostCard(
 }
 
 @Composable
+fun PostCardWithoutButtons(
+	modifier: Modifier = Modifier,
+	post: Post,
+) {
+	Column(
+		modifier = modifier
+			.padding(horizontal = 8.dp, vertical = 4.dp)
+			.clip(RoundedCornerShape(8))
+	) {
+		Column(
+			modifier = Modifier
+				.background(MaterialTheme.colorScheme.surface)
+		) {
+			Column(Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp)) {
+				// Header
+				PostHeader(post = post)
+				// Content
+				Box(Modifier.padding(12.dp)) {
+					Text(text = post.content)
+				}
+			}
+		}
+	}
+}
+
+@Composable
 fun PostHeader(post: Post) {
 	val pfp = post.author.pfp?.let {
 		BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
@@ -95,13 +117,13 @@ fun PostHeader(post: Post) {
 				val mod = Modifier
 					.width(24.dp)
 					.clip(RoundedCornerShape(100))
-				pfp?.let {
-					Image(modifier = mod, bitmap = it, contentDescription = null)
-				} ?: Image(
-					modifier = mod.then(Modifier.background(Color.Black)),
-					painter = painterResource(id = R.drawable.skully),
-					contentDescription = null
-				)
+//				pfp?.let {
+//					Image(modifier = mod, bitmap = it, contentDescription = null)
+//				} ?: Image(
+//					modifier = mod.then(Modifier.background(Color.Black)),
+//					painter = painterResource(id = R.drawable.skully),
+//					contentDescription = null
+//				)
 				Spacer(modifier = Modifier.width(8.dp))
 				Text(
 					text = "${u.fName} ${u.lName}",
@@ -122,21 +144,24 @@ fun PostHeader(post: Post) {
 private fun ButtonRow(onCommentsClicked: () -> Unit) {
 	Row(
 		modifier = Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.SpaceEvenly,
+		horizontalArrangement = Arrangement.End,
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		NumberedIcon(number = 0, imageProvider = Icons.Default.Share)
-		NumberedIcon(
-			number = 0,
-			imageProvider = painterResource(id = R.drawable.skully),
-			onClick = onCommentsClicked,
-
-			)
-		NumberedIcon(number = 0, imageProvider = Icons.Sharp.Favorite,
-			onClick = {
-				Log.d("TAG", "${BuildConfig.MY_API_KEY}")
-			}
-		)
+//		NumberedIcon(number = 0, imageProvider = Icons.Default.Share)
+//		NumberedIcon(
+//			number = 0,
+//			imageProvider = painterResource(id = R.drawable.skully),
+//			onClick = onCommentsClicked,
+//
+//			)
+//		NumberedIcon(number = 0, imageProvider = Icons.Sharp.Favorite,
+//			onClick = {
+//				Log.d("TAG", "${BuildConfig.MY_API_KEY}")
+//			}
+//		)
+		TextButton(onClick = onCommentsClicked) {
+			Text(text = "Comments")
+		}
 	}
 }
 

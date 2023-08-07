@@ -2,10 +2,15 @@
 My attempt implementing some basic features of Twitter with designs inspired by other apps like reddit.
 
 #### Features
-[x] Signup
-[x] Login
-[] Follow users
-[] d
+- [x] Signup
+- [x] Login
+- [ ] Display profile
+- [ ] Follow/Unfollow users
+- [ ] Show followed users
+- [ ] Show users following you
+- [x] Get feed containing posts by followed users
+- [x] Get post comments
+- [x] Reply to comments and posts
 
 #### TODO
 - Add comment post functionality

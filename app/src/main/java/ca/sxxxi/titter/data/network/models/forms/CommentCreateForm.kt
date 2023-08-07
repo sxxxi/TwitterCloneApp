@@ -1,4 +1,6 @@
 package ca.sxxxi.titter.data.network.models.forms
 
-class CommentCreateForm {
-}
+data class CommentCreateForm(
+	val recipientId: String? = null,
+	val content: String
+)

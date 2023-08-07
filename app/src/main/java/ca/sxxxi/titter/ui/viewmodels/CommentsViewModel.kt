@@ -8,11 +8,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import ca.sxxxi.titter.activeUser.ActiveUser
+import ca.sxxxi.titter.activeUser.activeUser
 import ca.sxxxi.titter.data.models.Comment
 import ca.sxxxi.titter.data.models.CommentReplyPage
 import ca.sxxxi.titter.data.models.Post
 import ca.sxxxi.titter.data.network.CommentsNetworkDataSource
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
+import ca.sxxxi.titter.data.network.models.forms.CommentCreateForm
 import ca.sxxxi.titter.data.repositories.AuthenticationRepository
 import ca.sxxxi.titter.data.repositories.CommentRepository
 import ca.sxxxi.titter.data.repositories.PostRepository
@@ -20,6 +23,7 @@ import ca.sxxxi.titter.data.repositories.paging.CommentsPagingSource
 import ca.sxxxi.titter.data.repositories.paging.PostsPagingSource
 import ca.sxxxi.titter.data.utils.contracts.CommentMapper
 import ca.sxxxi.titter.data.utils.mappers.ConcreteCommentMapper
+import ca.sxxxi.titter.data.utils.states.Status
 import ca.sxxxi.titter.ui.navigation.CommentsScreenArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +50,10 @@ class CommentsViewModel @Inject constructor(
 
 	init {
 		viewModelScope.launch {
+			authenticationRepository.activeUser.first().let { activeUser ->
+				_uiState.update { commentsUiState -> commentsUiState.copy(activeUser = activeUser) }
+			}
+
 			// Get post to display
 			postRepository.getPostById(args.postId).let {  post ->
 				_uiState.update { state ->
@@ -102,10 +110,40 @@ class CommentsViewModel @Inject constructor(
 		}
 	}
 
+	fun postComment() {
+		viewModelScope.launch {
+			// Gross
+			uiState.value.let { state ->
+				_uiState.update { it.copy(commentCreateStatus = Status.Loading) }
+				if (state.post != null && state.activeUser != null && state.commentCreateForm != null) {
+					commentRepository.postComment(
+						postId = state.post.id.toString(),
+						jwt = state.activeUser.key,
+						commentCreateForm = state.commentCreateForm
+					).onSuccess {
+						_uiState.update { it.copy(commentCreateStatus = Status.Success) }
+					}.onFailure {
+						_uiState.update { it.copy(commentCreateStatus = Status.Failure) }
+					}
+				} else {
+					_uiState.update { it.copy(commentCreateStatus = Status.Failure) }
+				}
+			}
+		}
+	}
+
+	fun editComment(comment: String) {
+		val commentForm = uiState.value.commentCreateForm?.copy(content = comment) ?: CommentCreateForm(content = comment)
+		_uiState.update { it.copy(commentCreateForm = commentForm, commentCreateStatus = Status.Neutral) }
+	}
+
 	data class CommentsUiState(
+		val activeUser: ActiveUser? = null,
 		val post: Post? = null,
 		val comments: Flow<PagingData<Comment>> = flow {  },
-		val commentRepliesStore: Map<String, List<CommentReplyPage>> = mutableMapOf()
+		val commentRepliesStore: Map<String, List<CommentReplyPage>> = mutableMapOf(),
+		val commentCreateForm: CommentCreateForm? = null,
+		val commentCreateStatus: Status = Status.Neutral
 	)
 
 	companion object {

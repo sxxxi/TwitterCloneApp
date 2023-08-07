@@ -23,7 +23,9 @@ fun NavGraphBuilder.commentsScreen(onBackPressed: () -> Unit) {
 		CommentsScreen(
 			uiState = uiState,
 			onBackPressed = onBackPressed,
-			repliesLoader = commentsViewModel::getCommentReplies
+			repliesLoader = commentsViewModel::getCommentReplies,
+			onCommentEdit = commentsViewModel::editComment,
+			onCommentAdd = commentsViewModel::postComment
 		)
 	}
 }

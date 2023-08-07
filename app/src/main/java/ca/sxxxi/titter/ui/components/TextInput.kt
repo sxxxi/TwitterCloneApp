@@ -69,7 +69,7 @@ fun TextInput(
 	val isFocused by interactionSource.collectIsFocusedAsState()
 	val inputShape by animateIntAsState(
 		targetValue = if (isFocused) 30 else 100,
-		animationSpec = spring(dampingRatio = 1f)
+		animationSpec = spring(dampingRatio = 1f), label = ""
 	)
 	val animatedBorderColor by animateColorAsState(
 		targetValue = when (validationStatusState) {
@@ -79,7 +79,7 @@ fun TextInput(
 				else
 					borderColor.unfocused
 			else -> validationStatusState.color
-		}
+		}, label = ""
 	)
 
 	/*
@@ -97,7 +97,8 @@ fun TextInput(
 	BasicTextField(
 		modifier = Modifier
 			.padding(8.dp)
-			.clip(RoundedCornerShape(inputShape)),
+			.clip(RoundedCornerShape(inputShape))
+			.then(modifier),
 		interactionSource = interactionSource,
 		keyboardOptions = keyboardOptions,
 		value = value,

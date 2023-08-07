@@ -122,9 +122,6 @@ dependencies {
 
     def paging_version = "3.2.0"
 
-//    implementation "androidx.paging:paging-compose:$paging_version"
-//    implementation "androidx.paging:paging-runtime:$paging_version"
-
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     implementation "androidx.paging:paging-compose:3.2.0"
 
