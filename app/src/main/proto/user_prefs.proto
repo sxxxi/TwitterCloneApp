@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "ca.sxxxi.titter.proto";
+option java_multiple_files = true;
+
+message Settings {
+  int64 latest_refresh = 1;
+  int32 current_page = 2;
+}

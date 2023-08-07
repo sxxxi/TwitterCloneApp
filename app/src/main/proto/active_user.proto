@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "ca.sxxxi.titter.activeUser";
+option java_multiple_files = true;
+
+message ActiveUser {
+  string id = 1;
+  string key = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string pfp = 5;
+}
