@@ -5,16 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import ca.sxxxi.titter.data.utils.states.Status
 
 @Composable
-fun <T: Any> PagedList(
+fun <T : Any> PagedList(
 	modifier: Modifier = Modifier,
 	pagingData: LazyPagingItems<T>,
 	refreshLoadingContent: @Composable () -> Unit = { CircularProgressIndicator() },
@@ -41,6 +39,7 @@ fun <T: Any> PagedList(
 					}
 				}
 			}
+
 			is LoadState.Loading -> refreshLoadingContent()
 			is LoadState.Error -> refreshErrorContent()
 		}
@@ -50,7 +49,7 @@ fun <T: Any> PagedList(
 
 
 @Composable
-fun <T: Any> ComposablePagedListContent(
+fun <T : Any> ComposablePagedListContent(
 	modifier: Modifier = Modifier,
 	pagingData: LazyPagingItems<T>,
 	refreshLoadingContent: @Composable () -> Unit = { CircularProgressIndicator() },
