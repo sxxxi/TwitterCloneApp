@@ -1,6 +1,9 @@
 ## Twitter Clone App
 My attempt implementing some basic features of Twitter with designs inspired by other apps like reddit.
 
+## Demo
+![](https://github.com/sxxxi/TwitterCloneApp/blob/main/misc/quckie.gif)
+
 #### Features
 - [x] Signup
 - [x] Login
