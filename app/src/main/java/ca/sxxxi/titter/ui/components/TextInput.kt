@@ -54,13 +54,13 @@ fun TextInput(
 	keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 	singleLine: Boolean = true,
 	visualTransformation: VisualTransformation = VisualTransformation.None,
-	required: Boolean = false,
 	validationStatus: FieldValidationStatus = FieldValidationStatus.Neutral,
 	borderColor: BorderColor = BorderColor(
 		focused = MaterialTheme.colorScheme.outline,
 		unfocused = MaterialTheme.colorScheme.outlineVariant
 	),
 	onFocusOut: () -> Unit = {},
+	onFocus: () -> Unit = {}
 ) {
 	var validationStatusState by remember { mutableStateOf(validationStatus) }
 	val interactionSource = remember { MutableInteractionSource() }
@@ -92,11 +92,17 @@ fun TextInput(
 
 	LaunchedEffect(key1 = isFocused) {
 		if (!isFocused) onFocusOut()
+		else onFocus()
 	}
 
 	BasicTextField(
 		modifier = Modifier
-			.padding(8.dp)
+			.border(
+				width = 2.dp,
+				color = animatedBorderColor,
+				shape = RoundedCornerShape(inputShape)
+			)
+//			.padding(8.dp)
 			.clip(RoundedCornerShape(inputShape))
 			.then(modifier),
 		interactionSource = interactionSource,
