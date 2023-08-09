@@ -72,16 +72,6 @@ fun PostCreateScreen(
 				.fillMaxWidth()
 				.padding(16.dp)
 		) {
-			IconButton(onClick = { /*TODO*/ }) {
-				Icon(imageVector = Icons.Default.Person, contentDescription = null)
-			}
-			IconButton(onClick = { /*TODO*/ }) {
-				Icon(imageVector = Icons.Default.Person, contentDescription = null)
-			}
-			IconButton(onClick = { /*TODO*/ }) {
-				Icon(imageVector = Icons.Default.Person, contentDescription = null)
-			}
-
 			Spacer(modifier = Modifier.weight(1f))
 
 			Button(
