@@ -2,7 +2,7 @@
 My attempt implementing some basic features of Twitter with designs inspired by other apps like reddit.
 
 ## Demo
-<img src="https://github.com/sxxxi/TwitterCloneApp/blob/main/misc/quickie.gif" width="250" />
+<img src="https://github.com/sxxxi/TwitterCloneApp/blob/main/misc/quickie1.gif" width="250" />
 
 #### Features
 - [x] Signup
