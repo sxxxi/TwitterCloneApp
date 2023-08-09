@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,44 +87,39 @@ private fun EditState(
 	onLoginRequest: () -> Unit,
 	onNavigateToSignup: () -> Unit
 ) {
-//	Surface(
-//		Modifier
-//			.background(MaterialTheme.colorScheme.background)
-//			.fillMaxSize()
-//			.padding(horizontal = 16.dp)
-//	) {
-		Column(
-			modifier = Modifier.fillMaxSize()
-				.background(MaterialTheme.colorScheme.background),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center
-		) {
-			Icon(
-				painter = painterResource(id = R.drawable.ic_launcher_foreground),
-				contentDescription = null
-			)
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(MaterialTheme.colorScheme.background),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.Center
+	) {
+		Icon(
+			painter = painterResource(id = R.drawable.ic_launcher_foreground),
+			contentDescription = null
+		)
 
-			InputFields(
-				uiState = uiState,
-				onInputChanged = onInputChanged
-			)
-			when (uiState.status) {
-				is LoginStatus.Unauthorized -> {
-					ErrorDisplay(
-						modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
-						message = uiState.status.message
-					)
-				}
-				else -> {
-					Spacer(modifier = Modifier.height(16.dp))
-				}
+		InputFields(
+			uiState = uiState,
+			onInputChanged = onInputChanged
+		)
+		when (uiState.status) {
+			is LoginStatus.Unauthorized -> {
+				ErrorDisplay(
+					modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
+					message = uiState.status.message
+				)
 			}
-			ButtonRow(
-				onNavigateToSignup = onNavigateToSignup,
-				onLoginRequest = onLoginRequest
-			)
+
+			else -> {
+				Spacer(modifier = Modifier.height(16.dp))
+			}
 		}
-//	}
+		ButtonRow(
+			onNavigateToSignup = onNavigateToSignup,
+			onLoginRequest = onLoginRequest
+		)
+	}
 }
 
 @Composable
@@ -160,7 +154,8 @@ private fun InputFields(
 
 	Column(
 		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		TextInput(
 			label = "Username",
@@ -170,8 +165,7 @@ private fun InputFields(
 				username = it
 				onInputChanged(username, pw)
 			},
-
-			)
+		)
 
 		PasswordInput(
 			label = "Password",

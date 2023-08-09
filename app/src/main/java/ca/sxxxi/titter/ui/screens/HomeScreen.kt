@@ -2,22 +2,17 @@ package ca.sxxxi.titter.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,7 +24,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +32,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.*
 import ca.sxxxi.titter.data.models.Post
 import ca.sxxxi.titter.data.models.User
+import ca.sxxxi.titter.ui.components.ComposablePagedListContent
 import ca.sxxxi.titter.ui.components.PostCard
 import ca.sxxxi.titter.ui.theme.TitterTheme
 import ca.sxxxi.titter.ui.viewmodels.HomeViewModel.HomeUiState
@@ -52,6 +47,7 @@ fun HomeScreen(
 	onNavigateToAuthentication: () -> Unit = {},
 	onLogout: () -> Unit = {},
 	onNavigateToComments: (String) -> Unit = {},
+	onNavigateToSearch: () -> Unit = {}
 ) {
 	val snackBarHostState = remember { SnackbarHostState() }
 	val pagingData = uiState.postPageDataFlow.collectAsLazyPagingItems()
@@ -68,9 +64,11 @@ fun HomeScreen(
 
 	LaunchedEffect(key1 = uiState.activeUser) {
 		Log.d("HomeScreen", "${uiState.activeUser == null}")
-		if (uiState.activeUser == null) { onNavigateToAuthentication() }
+		if (uiState.activeUser == null) {
+			onNavigateToAuthentication()
+		}
 	}
-	
+
 	Scaffold(
 		snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
 		floatingActionButton = {
@@ -87,9 +85,10 @@ fun HomeScreen(
 			TopBar(
 				activeUser = uiState.activeUser,
 				onLogout = onLogout,
+				onSearch = onNavigateToSearch,
 				onRefresh = { pagingData.refresh() }
 			)
-			
+
 			PostList(
 				modifier = Modifier.fillMaxSize(),
 				pagingData = pagingData,
@@ -105,37 +104,21 @@ private fun PostList(
 	pagingData: LazyPagingItems<Post>,
 	onCommentsClick: (String) -> Unit = {}
 ) {
-	Column(
+	ComposablePagedListContent(
 		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(8.dp)
-	) {
+		pagingData = pagingData,
+		refreshErrorContent = { Text(text = "Unable to reach server") }
+	) { post ->
+		PostCard(
+			post = post,
+			onCommentsClicked = onCommentsClick
+		)
 
-		if (pagingData.loadState.refresh is LoadState.Loading) {
-			CircularProgressIndicator()
-		} else {
-			LazyColumn {
-				items(count = pagingData.itemCount) { index ->
-					pagingData[index]?.let { post ->
-						PostCard(
-							post = post,
-							onCommentsClicked = onCommentsClick
-						)
-
-						Divider(
-							modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-							thickness = 1.dp,
-							color = MaterialTheme.colorScheme.outlineVariant
-						)
-					}
-				}
-				item {
-					if (pagingData.loadState.append is LoadState.Loading) {
-						CircularProgressIndicator()
-					}
-				}
-			}
-		}
+		Divider(
+			modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+			thickness = 1.dp,
+			color = MaterialTheme.colorScheme.outlineVariant
+		)
 	}
 }
 
@@ -144,16 +127,21 @@ private fun PostList(
 private fun TopBar(
 	activeUser: User?,
 	onLogout: () -> Unit = {},
-	onRefresh: () -> Unit = {}
+	onRefresh: () -> Unit = {},
+	onSearch: () -> Unit = {}
 ) {
 	TopAppBar(
 		title = { Text(text = "Home") },
-		colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = Color.Transparent),
+		colors = TopAppBarDefaults
+			.mediumTopAppBarColors(scrolledContainerColor = Color.Transparent),
 		actions = {
 			activeUser?.let {
 				Row {
 					TextButton(onClick = onLogout) {
 						Text(text = "Logout", color = MaterialTheme.colorScheme.error)
+					}
+					TextButton(onClick = onSearch) {
+						Text(text = "Search")
 					}
 					TextButton(onClick = onRefresh) {
 						Text(text = "Refresh")
@@ -173,7 +161,7 @@ fun PreviewHomeScreen() {
 				.background(MaterialTheme.colorScheme.background)
 		) {
 			HomeScreen(uiState = HomeUiState(
-				postPageDataFlow = flow {  }
+				postPageDataFlow = flow { }
 			))
 		}
 	}

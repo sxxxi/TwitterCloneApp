@@ -7,15 +7,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import ca.sxxxi.titter.Screen
-import ca.sxxxi.titter.di.HiltModule
-import ca.sxxxi.titter.di.MapperModule
 import ca.sxxxi.titter.ui.screens.HomeScreen
 import ca.sxxxi.titter.ui.viewmodels.HomeViewModel
 
 fun NavGraphBuilder.homeScreen(
 	onNavigateToAuthentication: () -> Unit,
 	onNavigateToPostCreate: () -> Unit,
-	onNavigateToComments: (String) -> Unit
+	onNavigateToComments: (String) -> Unit,
+	onNavigateToSearch: () -> Unit
 ) {
 	composable(route = Screen.Home.route, arguments = Screen.Home.arguments) {
 		val homeViewModel = hiltViewModel<HomeViewModel>()
@@ -25,7 +24,8 @@ fun NavGraphBuilder.homeScreen(
 			onPostCreateClicked = onNavigateToPostCreate,
 			onLogout = homeViewModel::logout,
 			onNavigateToAuthentication = onNavigateToAuthentication,
-			onNavigateToComments = onNavigateToComments
+			onNavigateToComments = onNavigateToComments,
+			onNavigateToSearch = onNavigateToSearch
 		)
 	}
 }

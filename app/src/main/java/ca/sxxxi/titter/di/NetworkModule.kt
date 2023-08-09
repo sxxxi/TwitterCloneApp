@@ -4,6 +4,7 @@ import ca.sxxxi.titter.data.network.AuthenticationNetworkDataSource
 import ca.sxxxi.titter.data.network.CommentsNetworkDataSource
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
 import ca.sxxxi.titter.data.network.ProfileNetworkDataSource
+import ca.sxxxi.titter.data.network.SearchNetworkDataSource
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -12,6 +13,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -53,4 +55,8 @@ object NetworkModule {
 		return retrofit.create(CommentsNetworkDataSource::class.java)
 	}
 
+	@Provides
+	fun searchNetworkDataSource(@TwitterCloneApi retrofit: Retrofit): SearchNetworkDataSource {
+		return retrofit.create(SearchNetworkDataSource::class.java)
+	}
 }

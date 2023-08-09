@@ -29,8 +29,10 @@ import ca.sxxxi.titter.ui.navigation.navigateToCommentsScreen
 import ca.sxxxi.titter.ui.navigation.navigateToHome
 import ca.sxxxi.titter.ui.navigation.navigateToLogin
 import ca.sxxxi.titter.ui.navigation.navigateToPostCreate
+import ca.sxxxi.titter.ui.navigation.navigateToSearch
 import ca.sxxxi.titter.ui.navigation.navigateToSignup
 import ca.sxxxi.titter.ui.navigation.postCreate
+import ca.sxxxi.titter.ui.navigation.searchScreen
 import ca.sxxxi.titter.ui.navigation.signup
 import ca.sxxxi.titter.ui.screens.TestingScreen
 import ca.sxxxi.titter.ui.theme.TitterTheme
@@ -90,11 +92,6 @@ val Context.userPrefsDataStore by dataStore(
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-//		setContent {
-//			TitterTheme {
-//				TestingScreen()
-//			}
-//		}
 		setContent {
 			TitterTheme {
 				val navController = rememberNavController()
@@ -106,7 +103,7 @@ class MainActivity : ComponentActivity() {
 				) {
 					NavHost(
 						navController = navController,
-//						startDestination = Screen.Home.route
+//						startDestination = Screen.SearchScreen.route
 						startDestination = NavGroup.Authorization.route
 					) {
 						navigation(
@@ -122,10 +119,12 @@ class MainActivity : ComponentActivity() {
 						homeScreen(
 							onNavigateToPostCreate = navController::navigateToPostCreate,
 							onNavigateToAuthentication = navController::navigateToLogin,
-							onNavigateToComments = navController::navigateToCommentsScreen
+							onNavigateToComments = navController::navigateToCommentsScreen,
+							onNavigateToSearch = navController::navigateToSearch
 						)
 						postCreate(onExitRequested = navController::popBackStack)
 						commentsScreen(onBackPressed = navController::popBackStack)
+						searchScreen()
 					}
 				}
 			}
@@ -151,5 +150,6 @@ sealed class Screen(
 		routeWithArgs = "comments/{${CommentsScreenArgs.POST_ID_ARG}}",
 		arguments = listOf(navArgument(CommentsScreenArgs.POST_ID_ARG) { type = NavType.StringType })
 	)
+	object SearchScreen : Screen(route = "search")
 
 }

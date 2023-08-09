@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -73,7 +74,8 @@ fun SignupScreen(
 
 	Column(
 		Modifier.padding(horizontal = 16.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		PfpPicker()
 		InputFields(
@@ -81,6 +83,7 @@ fun SignupScreen(
 			onInputChange = onInputChange,
 			scope = coroutineScope
 		)
+		Spacer(modifier = Modifier.height(16.dp))
 		FormButtons(
 			onNavigateToLogin = onNavigateToLogin,
 			onSignupRequest = onSignupRequest
@@ -212,7 +215,8 @@ private fun InputFields(
 
 	Column(
 		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		TextInput(
 			label = "Username",

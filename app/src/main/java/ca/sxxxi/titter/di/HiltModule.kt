@@ -15,10 +15,12 @@ import ca.sxxxi.titter.data.local.PostDb
 import ca.sxxxi.titter.data.local.dao.PostsDao
 import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
+import ca.sxxxi.titter.data.network.SearchNetworkDataSource
 import ca.sxxxi.titter.data.prefs.ConcreteUserPreferences
 import ca.sxxxi.titter.data.prefs.UserPreferences
 import ca.sxxxi.titter.data.repositories.AuthenticationRepository
 import ca.sxxxi.titter.data.repositories.paging.PostsRemoteMediator
+import ca.sxxxi.titter.data.repositories.paging.UserSearchPagingSource
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import ca.sxxxi.titter.proto.Settings
 import ca.sxxxi.titter.userPrefsDataStore
@@ -113,4 +115,11 @@ object HiltModule {
 			postMapper = postMapper
 		)
 	}
+
+//	@Provides
+//	fun userSearchPagingSource(
+//		userSearchNetworkDataSource: SearchNetworkDataSource
+//	): UserSearchPagingSource {
+//		return UserSearchPagingSource(userSearchNetworkDataSource)
+//	}
 }

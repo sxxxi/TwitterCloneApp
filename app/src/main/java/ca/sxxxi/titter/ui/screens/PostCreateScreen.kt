@@ -1,14 +1,12 @@
 package ca.sxxxi.titter.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -27,12 +25,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ca.sxxxi.titter.data.local.entities.PostEntity
-import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
 import ca.sxxxi.titter.data.network.models.forms.PostCreateForm
 import ca.sxxxi.titter.ui.theme.TitterTheme
 import ca.sxxxi.titter.ui.viewmodels.PostCreateViewModel.PostCreateUiState
-import kotlin.reflect.KFunction1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

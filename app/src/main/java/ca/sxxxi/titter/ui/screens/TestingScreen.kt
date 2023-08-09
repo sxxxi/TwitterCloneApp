@@ -11,7 +11,7 @@ import ca.sxxxi.titter.ui.viewmodels.TestingViewModel
 fun TestingScreen(viewModel: TestingViewModel = hiltViewModel()) {
 	Column {
 		Button(onClick = { viewModel.getClosestPost() }) {
-			Text(text = "First")	
+			Text(text = "First")
 		}
 		Button(onClick = { viewModel.test() }) {
 			Text(text = "Second")

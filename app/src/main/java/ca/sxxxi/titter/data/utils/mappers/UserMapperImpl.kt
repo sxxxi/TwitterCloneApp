@@ -5,7 +5,7 @@ import ca.sxxxi.titter.data.models.User
 import ca.sxxxi.titter.data.network.models.UserNM
 import ca.sxxxi.titter.data.utils.contracts.UserMapper
 
-class ConcreteUserMapper : UserMapper {
+class UserMapperImpl : UserMapper {
 	override fun networkToEntity(source: UserNM): UserEntity {
 		return UserEntity(
 			id = source.id,

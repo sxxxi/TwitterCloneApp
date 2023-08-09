@@ -10,7 +10,7 @@ import java.sql.Date
 import java.time.Instant
 import java.util.UUID
 
-class ConcretePostMapper(private val userMapper: UserMapper) : PostMapper {
+class PostMapperImpl(private val userMapper: UserMapper) : PostMapper {
 	override fun networkToEntity(source: PostNM): PostWithUser {
 		return PostWithUser(
 			post = PostEntity(

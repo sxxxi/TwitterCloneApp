@@ -1,11 +1,18 @@
 package ca.sxxxi.titter.di
 
+import ca.sxxxi.titter.data.models.UserSearchItem
+import ca.sxxxi.titter.data.network.models.responses.UserSearchResult
 import ca.sxxxi.titter.data.utils.contracts.CommentMapper
-import ca.sxxxi.titter.data.utils.mappers.ConcretePostMapper
-import ca.sxxxi.titter.data.utils.mappers.ConcreteUserMapper
+import ca.sxxxi.titter.data.utils.contracts.NDMapper
+import ca.sxxxi.titter.data.utils.contracts.PageMapper
+import ca.sxxxi.titter.data.utils.mappers.PostMapperImpl
+import ca.sxxxi.titter.data.utils.mappers.UserMapperImpl
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import ca.sxxxi.titter.data.utils.contracts.UserMapper
-import ca.sxxxi.titter.data.utils.mappers.ConcreteCommentMapper
+import ca.sxxxi.titter.data.utils.contracts.UserSearchMapper
+import ca.sxxxi.titter.data.utils.mappers.CommentMapperImpl
+import ca.sxxxi.titter.data.utils.mappers.PageMapperImpl
+import ca.sxxxi.titter.data.utils.mappers.UserSearchMapperImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,16 +23,28 @@ import dagger.hilt.components.SingletonComponent
 object MapperModule {
 	@Provides
 	fun userMapper(): UserMapper {
-		return ConcreteUserMapper()
+		return UserMapperImpl()
 	}
 
 	@Provides
 	fun postMapper(): PostMapper {
-		return ConcretePostMapper(userMapper())
+		return PostMapperImpl(userMapper())
 	}
 
 	@Provides
 	fun commentMapper(userMapper: UserMapper): CommentMapper {
-		return ConcreteCommentMapper(userMapper)
+		return CommentMapperImpl(userMapper = userMapper)
+	}
+
+	@Provides
+	fun userSearchMapper(userMapper: UserMapper): NDMapper<List<UserSearchResult>, List<UserSearchItem>> {
+		return UserSearchMapperImpl(userMapper = userMapper)
+	}
+
+	@Provides
+	fun pageMapper(
+		nToDMapper: NDMapper<List<UserSearchResult>, List<UserSearchItem>>
+	): PageMapper<List<UserSearchResult>, List<UserSearchItem>> {
+		return PageMapperImpl(nToDMapper)
 	}
 }
