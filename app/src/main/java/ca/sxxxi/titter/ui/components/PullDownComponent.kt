@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -56,8 +57,8 @@ fun RefreshableComponent(
 	}
 
 	val parentScrollableState = rememberScrollableState(consumeScrollDelta = {
-		if (scrollVal < hideOffset && isDragged) {
-			scrollVal += kotlin.math.abs(it) / 5
+		if (scrollVal <= hideOffset && isDragged) {
+			scrollVal += it / 7
 		}
 		if (scrollVal > hideOffset) scrollVal = hideOffset
 		it
