@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +17,7 @@ import androidx.paging.compose.LazyPagingItems
 fun <T : Any> PagedList(
 	modifier: Modifier = Modifier,
 	pagingData: LazyPagingItems<T>,
+	lazyListState: LazyListState = rememberLazyListState(),
 	refreshLoadingContent: @Composable () -> Unit = { CircularProgressIndicator() },
 	refreshErrorContent: @Composable () -> Unit = { },
 	listEmptyContent: @Composable () -> Unit = { },
@@ -28,7 +31,10 @@ fun <T : Any> PagedList(
 	) {
 		when (pagingData.loadState.refresh) {
 			is LoadState.NotLoading -> {
-				LazyColumn(Modifier.weight(1f)) {
+				LazyColumn(
+					modifier = Modifier.weight(1f),
+					state = lazyListState
+				) {
 					content()
 					item {
 						if (pagingData.itemCount == 0) {
@@ -52,6 +58,7 @@ fun <T : Any> PagedList(
 fun <T : Any> ComposablePagedListContent(
 	modifier: Modifier = Modifier,
 	pagingData: LazyPagingItems<T>,
+	lazyListState: LazyListState = rememberLazyListState(),
 	refreshLoadingContent: @Composable () -> Unit = { CircularProgressIndicator() },
 	refreshErrorContent: @Composable () -> Unit = { },
 	listEmptyContent: @Composable () -> Unit = { },
@@ -61,6 +68,7 @@ fun <T : Any> ComposablePagedListContent(
 	PagedList(
 		modifier = modifier,
 		pagingData = pagingData,
+		lazyListState = lazyListState,
 		refreshLoadingContent = refreshLoadingContent,
 		refreshErrorContent = refreshErrorContent,
 		listEmptyContent = listEmptyContent,

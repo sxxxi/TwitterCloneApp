@@ -125,6 +125,10 @@ dependencies {
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     implementation "androidx.paging:paging-compose:3.2.0"
 
+
+    // Swiperefresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
 }
 
 protobuf {

@@ -22,18 +22,18 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-	background = Neutral50,
-	onBackground = Neutral900,
-	surface = Neutral50,
-	onSurface = Neutral800,
-	outline = Neutral600,
-	outlineVariant = Neutral100,
-	primary = Mint500,
-	primaryContainer = Mint100,
-	onPrimaryContainer = Mint800,
-	secondary = Mint200,
-	secondaryContainer = Mint100,
-	onSecondaryContainer = Mint800,
+//	background = Neutral50,
+//	onBackground = Neutral900,
+//	surface = Neutral50,
+//	onSurface = Neutral800,
+//	outline = Neutral600,
+//	outlineVariant = Neutral100,
+//	primary = Mint500,
+//	primaryContainer = Mint100,
+//	onPrimaryContainer = Mint800,
+//	secondary = Mint200,
+//	secondaryContainer = Mint100,
+//	onSecondaryContainer = Mint800,
 )
 
 @Composable
