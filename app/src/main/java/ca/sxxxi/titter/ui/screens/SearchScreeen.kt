@@ -94,7 +94,6 @@ private fun UserSearchResultSet(
 		modifier = modifier,
 		pagingData = searchResults,
 		listEmptyContent = { Text(text = "No results found") },
-		refreshErrorContent = { Text(text = "No results found") }
 	) { result ->
 		UserCardWithFollowButton(
 			modifier = Modifier.fillMaxWidth(),

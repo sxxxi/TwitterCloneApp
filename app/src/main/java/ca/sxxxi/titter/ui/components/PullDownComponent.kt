@@ -2,6 +2,7 @@ package ca.sxxxi.titter.ui.components
 
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +53,7 @@ fun RefreshableComponent(
 	val childInteractionSource = childScrollState.interactionSource
 	val isDragged by childInteractionSource.collectIsDraggedAsState()
 	val inPullPhase = remember(scrollVal, childScrollState) { scrollVal > 0 }
-	val maxPullReached = remember(scrollVal, hideOffset) { scrollVal == hideOffset }
+	val maxPullReached = remember(scrollVal, hideOffset) { scrollVal >= (hideOffset * 0.95) }
 	var pullState: PullState by remember {
 		mutableStateOf(PullState.Neutral)
 	}
@@ -64,6 +66,7 @@ fun RefreshableComponent(
 		it
 	})
 
+	// Side effect for adding behavior on each state
 	LaunchedEffect(key1 = pullState) {
 		Log.d("PullState", "$pullState")
 		when (pullState) {
@@ -78,8 +81,8 @@ fun RefreshableComponent(
 		}
 	}
 
-	LaunchedEffect(isDragged, inPullPhase, pullState, maxPullReached, isLoading) {
-		Log.d("PullState", "$pullState")
+	// Side effect for managing the states
+	LaunchedEffect(isDragged, pullState, isLoading, maxPullReached, inPullPhase) {
 		if (isDragged) {
 			pullState = if (inPullPhase) {
 				if (maxPullReached) {
@@ -95,17 +98,15 @@ fun RefreshableComponent(
 				is PullState.Pulled -> {
 					pullState = PullState.Neutral
 				}
-
 				is PullState.Max -> {
 					pullState = PullState.Released
 				}
-
 				is PullState.Loading -> {
-					if (!isLoading)
-						pullState = PullState.Neutral
-					else pullState = PullState.Loading
+					pullState = if (!isLoading)
+						PullState.Neutral
+					else
+						PullState.Loading
 				}
-
 				else -> {}
 			}
 

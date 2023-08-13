@@ -50,6 +50,7 @@ import ca.sxxxi.titter.ui.components.ComposablePagedListContent
 import ca.sxxxi.titter.ui.components.PostCard
 import ca.sxxxi.titter.ui.components.PullState
 import ca.sxxxi.titter.ui.components.RefreshableComponent
+import ca.sxxxi.titter.ui.components.RefreshablePagedList
 import ca.sxxxi.titter.ui.theme.TitterTheme
 import ca.sxxxi.titter.ui.viewmodels.HomeViewModel.HomeUiState
 import kotlinx.coroutines.flow.flow
@@ -68,7 +69,7 @@ fun HomeScreen(
 	val snackBarHostState = remember { SnackbarHostState() }
 	val pagingData = uiState.postPageDataFlow.collectAsLazyPagingItems()
 	val isRefreshing = remember(pagingData.loadState.refresh) {
-		pagingData.loadState.refresh !is LoadState.NotLoading
+		pagingData.loadState.refresh is LoadState.Loading
 	}
 	val childListState = rememberLazyListState()
 
@@ -96,7 +97,6 @@ fun HomeScreen(
 				activeUser = uiState.activeUser,
 				onLogout = onLogout,
 				onSearch = onNavigateToSearch,
-				onRefresh = { pagingData.refresh() }
 			)
 		},
 		floatingActionButton = {
@@ -107,6 +107,7 @@ fun HomeScreen(
 	) {
 		Column(
 			Modifier
+				.fillMaxSize()
 				.then(modifier)
 				.padding(it)
 		) {
@@ -115,75 +116,43 @@ fun HomeScreen(
 				pagingData = pagingData,
 				lazyListState = childListState,
 				onCommentsClick = onNavigateToComments,
+				onRefresh = { pagingData.refresh() },
 				isRefreshing = isRefreshing,
-				childListState = childListState
 			)
 		}
 	}
 }
 
 @Composable
-private fun PostList(
+fun PostList(
 	modifier: Modifier = Modifier,
 	pagingData: LazyPagingItems<Post>,
 	lazyListState: LazyListState = rememberLazyListState(),
+	onRefresh: () -> Unit,
 	onCommentsClick: (String) -> Unit = {},
 	isRefreshing: Boolean,
-	childListState: LazyListState
 ) {
-	RefreshableComponent(
-		childScrollState = childListState,
-		refreshIndicator = { offsetY, pullState ->
-			Column(
-				modifier = Modifier
-					.height(100.dp)
-					.offset(y = offsetY.dp),
-				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				Text(
-					modifier = Modifier
-						.background(MaterialTheme.colorScheme.primaryContainer)
-						.weight(1f)
-						.fillMaxWidth()
-					,
-					text = when (pullState) {
-						is PullState.Neutral -> ""
-						is PullState.Max -> "Release to refresh"
-						is PullState.Loading -> "Refreshing"
-						else -> "Release to cancel"
-					},
-
-					style = MaterialTheme.typography.headlineMedium + TextStyle(
-						color = MaterialTheme.colorScheme.primary,
-						fontWeight = FontWeight.Bold,
-						textAlign = TextAlign.Center,
-					)
-				)
-			}
-		},
-		indicatorHeight = 100.dp,
-		pullDownHandler =  {
-			pagingData.refresh()
-		},
-		isLoading = isRefreshing
+	RefreshablePagedList(
+		modifier = modifier,
+		pagingData = pagingData,
+		refreshHandler = onRefresh,
+		isRefreshing = isRefreshing,
+		scrollState = lazyListState,
 	) {
-		ComposablePagedListContent(
-			modifier = modifier,
-			pagingData = pagingData,
-			lazyListState = lazyListState,
-			refreshErrorContent = { Text(text = "Unable to reach server") }
-		) { post ->
-			PostCard(
-				post = post,
-				onCommentsClicked = onCommentsClick
-			)
-
-			Divider(
-				modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-				thickness = 1.dp,
-				color = MaterialTheme.colorScheme.outlineVariant
-			)
+		pagingData.itemSnapshotList.forEach {
+			it?.let { post ->
+				item {
+					PostCard(
+						post = post,
+						onCommentsClicked = onCommentsClick
+					)
+					Divider(
+						modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+						thickness = 1.dp,
+						color = MaterialTheme.colorScheme.outlineVariant
+					)
+				}
+			}
 		}
 	}
 }
@@ -193,7 +162,6 @@ private fun PostList(
 private fun TopBar(
 	activeUser: User?,
 	onLogout: () -> Unit = {},
-	onRefresh: () -> Unit = {},
 	onSearch: () -> Unit = {}
 ) {
 	TopAppBar(
@@ -210,42 +178,11 @@ private fun TopBar(
 							tint = MaterialTheme.colorScheme.error
 						)
 					}
-					IconButton(onClick = onRefresh) {
-						Icon(imageVector = Icons.Default.Refresh, contentDescription = "")
-					}
 					IconButton(onClick = onSearch) {
 						Icon(imageVector = Icons.Default.Search, contentDescription = "")
 					}
 				}
 			}
-		})
-}
-
-@Preview
-@Composable
-fun PreviewHomeScreen() {
-	TitterTheme {
-		Surface(
-			Modifier
-				.fillMaxSize()
-				.background(MaterialTheme.colorScheme.background)
-		) {
-			HomeScreen(uiState = HomeUiState(
-				postPageDataFlow = flow {
-					emit(PagingData.from(
-						listOf(
-							Post(
-								author = User(
-									id = "seiji",
-									fName = "Seiji",
-									lName = "Akakabe"
-								),
-								content = "Hi there!"
-							)
-						)
-					))
-				}
-			))
 		}
-	}
+	)
 }

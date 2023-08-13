@@ -2,6 +2,7 @@ package ca.sxxxi.titter.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
@@ -34,7 +38,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -45,6 +51,9 @@ import ca.sxxxi.titter.data.utils.states.Status
 import ca.sxxxi.titter.ui.components.IndentedItem
 import ca.sxxxi.titter.ui.components.PagedList
 import ca.sxxxi.titter.ui.components.PostCardWithoutButtons
+import ca.sxxxi.titter.ui.components.PullState
+import ca.sxxxi.titter.ui.components.RefreshableComponent
+import ca.sxxxi.titter.ui.components.RefreshablePagedList
 import ca.sxxxi.titter.ui.components.TextInput
 import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
 
@@ -134,7 +143,6 @@ fun CommentTextBox(
 			.background(bg)
 			.then(modifier)
 	) {
-
 		Row(
 			modifier = Modifier
 				.padding(8.dp),
@@ -165,13 +173,15 @@ private fun CommentsList(
 	repliesLoader: (String) -> Unit
 ) {
 	val snackBarHostState = remember { SnackbarHostState() }
+	val isRefreshing = remember(comments.loadState.refresh) {
+		comments.loadState.refresh !is LoadState.NotLoading
+	}
 
 	LaunchedEffect(key1 = comments.loadState.refresh) {
 		when (comments.loadState.refresh) {
 			is LoadState.Error -> {
 				snackBarHostState.showSnackbar("Having difficulties fetching post comments.")
 			}
-
 			else -> {}
 		}
 	}
@@ -181,16 +191,39 @@ private fun CommentsList(
 			SnackbarHost(hostState = snackBarHostState)
 		}
 	) { scaffoldPadding ->
-		PagedList(
+		CommentsSection(
 			modifier = Modifier.padding(scaffoldPadding),
-			pagingData = comments
-		) {
-			commentNodes(
-				comments = comments.itemSnapshotList.items,
-				repliesStore = repliesStore,
-				replyLoader = repliesLoader
-			)
-		}
+			pagingData = comments,
+			onRefresh = { comments.refresh() },
+			repliesStore = repliesStore,
+			repliesLoader = repliesLoader,
+			isRefreshing = isRefreshing
+		)
+	}
+}
+
+@Composable
+fun CommentsSection(
+	modifier: Modifier = Modifier,
+	pagingData: LazyPagingItems<Comment>,
+	lazyListState: LazyListState = rememberLazyListState(),
+	onRefresh: () -> Unit,
+	repliesStore: Map<String, List<CommentReplyPage>>,
+	repliesLoader: (String) -> Unit,
+	isRefreshing: Boolean,
+) {
+	RefreshablePagedList(
+		modifier = modifier,
+		pagingData = pagingData,
+		refreshHandler = onRefresh,
+		isRefreshing = isRefreshing,
+		scrollState = lazyListState,
+	) {
+		commentNodes(
+			comments = pagingData.itemSnapshotList.items,
+			repliesStore = repliesStore,
+			replyLoader = repliesLoader
+		)
 	}
 }
 
@@ -252,7 +285,6 @@ private fun LazyListScope.commentNode(
 				) {
 					TextButton(onClick = {
 						replyLoader(comment.id)
-						Log.d("BABABOOEY", replies.toString())
 					}) {
 						Text(text = "Load replies")
 					}
