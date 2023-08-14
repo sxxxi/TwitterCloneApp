@@ -3,34 +3,22 @@ package ca.sxxxi.titter.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import ca.sxxxi.titter.data.local.PostDb
-import ca.sxxxi.titter.data.local.dao.PostsDao
-import ca.sxxxi.titter.data.local.entities.PostEntity
 import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
 import ca.sxxxi.titter.data.models.Post
 import ca.sxxxi.titter.data.models.User
-import ca.sxxxi.titter.data.network.PostNetworkDataSource
-import ca.sxxxi.titter.data.prefs.UserPreferences
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
-import ca.sxxxi.titter.data.repositories.PostRepository
-import ca.sxxxi.titter.data.repositories.paging.PostsPagingSource
-import ca.sxxxi.titter.data.repositories.paging.PostsRemoteMediator
+import ca.sxxxi.titter.data.repositories.post.PostRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.post.PostRepositoryImpl
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -55,7 +43,7 @@ class HomeViewModel @Inject constructor(
 
 	init {
 		viewModelScope.launch(Dispatchers.IO) {
-			authRepo.activeUser.collect() { activeUser ->
+			authRepo.activeUser.collect { activeUser ->
 				val user: User? = if (activeUser.id.isNotEmpty()) {
 					User(
 						id = activeUser.id,

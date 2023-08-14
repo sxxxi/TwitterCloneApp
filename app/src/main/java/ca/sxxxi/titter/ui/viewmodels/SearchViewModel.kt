@@ -9,10 +9,10 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import ca.sxxxi.titter.activeUser.ActiveUser
 import ca.sxxxi.titter.data.models.UserSearchItem
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
-import ca.sxxxi.titter.data.repositories.ProfileRepository
-import ca.sxxxi.titter.data.repositories.SearchRepository
-import ca.sxxxi.titter.data.repositories.paging.UserSearchPagingSource
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.user.ProfileRepository
+import ca.sxxxi.titter.data.repositories.search.SearchRepository
+import ca.sxxxi.titter.data.paging.UserSearchPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

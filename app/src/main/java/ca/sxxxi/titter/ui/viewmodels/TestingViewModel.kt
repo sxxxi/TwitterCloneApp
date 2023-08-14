@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import ca.sxxxi.titter.data.network.CommentsNetworkDataSource
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
 import ca.sxxxi.titter.data.prefs.UserPreferences
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.await
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel

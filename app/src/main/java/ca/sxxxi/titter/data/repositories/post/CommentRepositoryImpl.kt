@@ -1,4 +1,4 @@
-package ca.sxxxi.titter.data.repositories
+package ca.sxxxi.titter.data.repositories.post
 
 import android.util.Log
 import ca.sxxxi.titter.data.models.CommentReplyPage
@@ -11,14 +11,14 @@ import retrofit2.HttpException
 import retrofit2.await
 import javax.inject.Inject
 
-class CommentRepository @Inject constructor(
+class CommentRepositoryImpl @Inject constructor(
 	private val commentsNetworkDataSource: CommentsNetworkDataSource,
 	private val commentMapper: CommentMapper
-) {
-	suspend fun getCommentRepliesById(
+) : CommentRepository {
+	override suspend fun getCommentRepliesById(
 		id: String,
 		commentsMap: Map<String, List<CommentReplyPage>>,
-		depth: Int = 0,
+		depth: Int,
 	): CommentReplyPage? = withContext(Dispatchers.IO) {
 		// Get newest page of replies from commentsMap
 		val lastPageFetched = commentsMap[id]?.maxByOrNull { it.page }
@@ -45,7 +45,7 @@ class CommentRepository @Inject constructor(
 		)
 	}
 
-	suspend fun postComment(
+	override suspend fun postComment(
 		postId: String,
 		jwt: String,
 		commentCreateForm: CommentCreateForm

@@ -1,4 +1,4 @@
-package ca.sxxxi.titter.data.repositories.paging
+package ca.sxxxi.titter.data.paging
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -9,7 +9,7 @@ import ca.sxxxi.titter.data.local.PostDb
 import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
 import ca.sxxxi.titter.data.prefs.UserPreferences
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException

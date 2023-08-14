@@ -1,4 +1,4 @@
-package ca.sxxxi.titter.data.repositories
+package ca.sxxxi.titter.data.repositories.search
 
 import ca.sxxxi.titter.data.models.Page
 import ca.sxxxi.titter.data.models.UserSearchItem
@@ -10,11 +10,11 @@ import retrofit2.await
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class SearchRepository @Inject constructor(
+class SearchRepositoryImpl @Inject constructor(
 	private val searchService: SearchNetworkDataSource,
 	private val pageMapper: PageMapper<List<UserSearchResult>, List<UserSearchItem>>
-) {
-	suspend fun searchUser(
+) : SearchRepository {
+	override suspend fun searchUser(
 		jwt: String,
 		term: String,
 		page: Int,

@@ -2,7 +2,6 @@ package ca.sxxxi.titter.data.local.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -10,10 +9,7 @@ import androidx.room.Transaction
 import ca.sxxxi.titter.data.local.entities.PostEntity
 import ca.sxxxi.titter.data.local.entities.UserEntity
 import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
-import ca.sxxxi.titter.data.models.Post
-import ca.sxxxi.titter.data.repositories.PostRepository
 import kotlinx.coroutines.flow.Flow
-import java.util.Optional
 
 @Dao
 abstract class PostsDao {

@@ -1,18 +1,16 @@
-package ca.sxxxi.titter.data.repositories.paging
+package ca.sxxxi.titter.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ca.sxxxi.titter.data.models.Comment
 import ca.sxxxi.titter.data.network.CommentsNetworkDataSource
-import ca.sxxxi.titter.data.network.models.responses.PagedResponse
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import ca.sxxxi.titter.data.utils.contracts.CommentMapper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import retrofit2.await
 import java.io.IOException
-import java.util.UUID
 
 class CommentsPagingSource(
 	private val postId: String,

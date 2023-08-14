@@ -14,10 +14,10 @@ import ca.sxxxi.titter.data.models.CommentReplyPage
 import ca.sxxxi.titter.data.models.Post
 import ca.sxxxi.titter.data.network.CommentsNetworkDataSource
 import ca.sxxxi.titter.data.network.models.forms.CommentCreateForm
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
-import ca.sxxxi.titter.data.repositories.CommentRepository
-import ca.sxxxi.titter.data.repositories.PostRepository
-import ca.sxxxi.titter.data.repositories.paging.CommentsPagingSource
+import ca.sxxxi.titter.data.paging.CommentsPagingSource
+import ca.sxxxi.titter.data.repositories.post.CommentRepository
+import ca.sxxxi.titter.data.repositories.post.PostRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import ca.sxxxi.titter.data.utils.contracts.CommentMapper
 import ca.sxxxi.titter.data.utils.states.Status
 import ca.sxxxi.titter.ui.navigation.CommentsScreenArgs
@@ -34,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle,
-	private val postRepository: PostRepository,
+	private val postRepositoryImpl: PostRepository,
 	private val commentsNetworkDataSource: CommentsNetworkDataSource,
 	private val authenticationRepository: AuthenticationRepository,
 	private val commentMapper: CommentMapper,
@@ -51,7 +51,7 @@ class CommentsViewModel @Inject constructor(
 			}
 
 			// Get post to display
-			postRepository.getPostById(args.postId).let {  post ->
+			postRepositoryImpl.getPostById(args.postId).let { post ->
 				_uiState.update { state ->
 					state.copy(
 						post = post,
@@ -85,7 +85,7 @@ class CommentsViewModel @Inject constructor(
 				id = commentId,
 				commentsMap = commentsReplyStore,
 				depth = depth
-			)?.let {  newCommentReplyPage ->
+			)?.let { newCommentReplyPage ->
 				// Update uiState
 				val replyStoreCopy = mutableMapOf<String, List<CommentReplyPage>>()
 				replyStoreCopy.putAll(commentsReplyStore)
@@ -129,14 +129,20 @@ class CommentsViewModel @Inject constructor(
 	}
 
 	fun editComment(comment: String) {
-		val commentForm = uiState.value.commentCreateForm?.copy(content = comment) ?: CommentCreateForm(content = comment)
-		_uiState.update { it.copy(commentCreateForm = commentForm, commentCreateStatus = Status.Neutral) }
+		val commentForm = uiState.value.commentCreateForm?.copy(content = comment)
+			?: CommentCreateForm(content = comment)
+		_uiState.update {
+			it.copy(
+				commentCreateForm = commentForm,
+				commentCreateStatus = Status.Neutral
+			)
+		}
 	}
 
 	data class CommentsUiState(
 		val activeUser: ActiveUser? = null,
 		val post: Post? = null,
-		val comments: Flow<PagingData<Comment>> = flow {  },
+		val comments: Flow<PagingData<Comment>> = flow { },
 		val commentRepliesStore: Map<String, List<CommentReplyPage>> = mutableMapOf(),
 		val commentCreateForm: CommentCreateForm? = null,
 		val commentCreateStatus: Status = Status.Neutral

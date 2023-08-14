@@ -1,4 +1,4 @@
-package ca.sxxxi.titter.data.repositories
+package ca.sxxxi.titter.data.repositories.post
 
 import android.util.Log
 import ca.sxxxi.titter.data.local.dao.PostsDao
@@ -9,6 +9,7 @@ import ca.sxxxi.titter.data.network.models.PostNM
 import ca.sxxxi.titter.data.network.models.forms.PostCreateForm
 import ca.sxxxi.titter.data.network.models.responses.PagedResponse
 import ca.sxxxi.titter.data.prefs.UserPreferences
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ import retrofit2.await
 import java.io.IOException
 import javax.inject.Inject
 
-class PostRepository @Inject constructor(
+class PostRepositoryImpl @Inject constructor(
 	private val commentsNetworkDataSource: CommentsNetworkDataSource,
 	private val postsDao: PostsDao,
 	private val dispatcher: CoroutineDispatcher,
@@ -27,8 +28,8 @@ class PostRepository @Inject constructor(
 	private val authRepo: AuthenticationRepository,
 	private val postMapper: PostMapper,
 	private val userPrefs: UserPreferences
-) {
-	suspend fun getPostById(postId: String): Post? = withContext(Dispatchers.IO) {
+) : PostRepository {
+	override suspend fun getPostById(postId: String): Post? = withContext(Dispatchers.IO) {
 		val tag = "getPostById"
 		try {
 			return@withContext postNetSource.getPostById(postId).await().let { nm ->
@@ -45,7 +46,7 @@ class PostRepository @Inject constructor(
 		}
 	}
 
-	suspend fun getPostPage(page: Int): Result<PagedResponse<List<Post>>> {
+	override suspend fun getPostPage(page: Int): Result<PagedResponse<List<Post>>> {
 		return try {
 			if (userPrefs.latestRefreshDate.first() == 0L) {
 				userPrefs.setLatestRefreshDate()
@@ -85,9 +86,9 @@ class PostRepository @Inject constructor(
 		}
 	}
 
-	fun invalidatePostCache() = postsDao.deleteAllPosts()
+	override fun invalidatePostCache() = postsDao.deleteAllPosts()
 
-	suspend fun sendPostToRemote(post: PostCreateForm): Result<PostNM> =
+	override suspend fun sendPostToRemote(post: PostCreateForm): Result<PostNM> =
 		withContext(Dispatchers.IO) {
 			return@withContext try {
 				val token = authRepo.activeUser.first().key

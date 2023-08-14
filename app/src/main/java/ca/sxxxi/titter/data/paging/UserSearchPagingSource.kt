@@ -1,16 +1,10 @@
-package ca.sxxxi.titter.data.repositories.paging
+package ca.sxxxi.titter.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ca.sxxxi.titter.data.models.Page
 import ca.sxxxi.titter.data.models.UserSearchItem
-import ca.sxxxi.titter.data.network.SearchNetworkDataSource
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
-import ca.sxxxi.titter.data.utils.contracts.UserSearchMapper
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.flow.first
-import java.lang.Exception
-import java.lang.IllegalArgumentException
 
 class UserSearchPagingSource(
 	private val dataLoader: (loadKey: Int) -> Deferred<Page<List<UserSearchItem>>>

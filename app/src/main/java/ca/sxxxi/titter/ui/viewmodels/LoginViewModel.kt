@@ -3,10 +3,9 @@ package ca.sxxxi.titter.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.sxxxi.titter.data.network.models.forms.LoginRequest
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest

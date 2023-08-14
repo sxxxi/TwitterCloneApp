@@ -1,9 +1,10 @@
-package ca.sxxxi.titter.data.repositories.paging
+package ca.sxxxi.titter.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ca.sxxxi.titter.data.models.Post
-import ca.sxxxi.titter.data.repositories.PostRepository
+import ca.sxxxi.titter.data.repositories.post.PostRepository
+import ca.sxxxi.titter.data.repositories.post.PostRepositoryImpl
 
 // Paging without caching in the local database
 class PostsPagingSource(

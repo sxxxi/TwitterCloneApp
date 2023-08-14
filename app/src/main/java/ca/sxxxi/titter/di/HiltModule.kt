@@ -15,17 +15,13 @@ import ca.sxxxi.titter.data.local.PostDb
 import ca.sxxxi.titter.data.local.dao.PostsDao
 import ca.sxxxi.titter.data.local.entities.combine.PostWithUser
 import ca.sxxxi.titter.data.network.PostNetworkDataSource
-import ca.sxxxi.titter.data.network.SearchNetworkDataSource
 import ca.sxxxi.titter.data.prefs.ConcreteUserPreferences
 import ca.sxxxi.titter.data.prefs.UserPreferences
-import ca.sxxxi.titter.data.repositories.AuthenticationRepository
-import ca.sxxxi.titter.data.repositories.paging.PostsRemoteMediator
-import ca.sxxxi.titter.data.repositories.paging.UserSearchPagingSource
+import ca.sxxxi.titter.data.repositories.user.AuthenticationRepository
+import ca.sxxxi.titter.data.paging.PostsRemoteMediator
 import ca.sxxxi.titter.data.utils.contracts.PostMapper
 import ca.sxxxi.titter.proto.Settings
 import ca.sxxxi.titter.userPrefsDataStore
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,9 +29,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
