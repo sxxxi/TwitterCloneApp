@@ -68,7 +68,7 @@ fun NewInput(
 	modifier: Modifier = Modifier,
 	value: String,
 	onValueChange: (String) -> Unit,
-	trailingIcon: @Composable () -> Unit = {},
+	trailingIcon: (@Composable () -> Unit)? = null,
 	label: (@Composable () -> Unit)? = null,
 	borderColors: InputBorderColors = InputBorderColors(
 		unfocusedColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -77,6 +77,7 @@ fun NewInput(
 		disabledColor = MaterialTheme.colorScheme.surface
 	),
 	singleLine: Boolean = true,
+	maxLines: Int = 1,
 	keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 	keyboardActions: KeyboardActions = KeyboardActions {},
 ) {
@@ -117,7 +118,8 @@ fun NewInput(
 		interactionSource = interactionSource,
 		singleLine = singleLine,
 		keyboardActions = keyboardActions,
-		keyboardOptions = keyboardOptions
+		keyboardOptions = keyboardOptions,
+		maxLines = maxLines
 	)
 }
 

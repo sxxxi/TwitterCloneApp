@@ -63,6 +63,20 @@ class CommentsViewModel @Inject constructor(
 		}
 	}
 
+	fun updateRecipient(recipient: Comment?) {
+		// update comment create recipient
+		_uiState.update {
+			it.copy(
+				commentCreateForm = it.commentCreateForm.copy(
+					recipientId = recipient?.id,
+					content = ""
+				),
+				commentRecipient = recipient
+			)
+		}
+	}
+
+
 	private fun commentsPager(postId: String): Flow<PagingData<Comment>> {
 		return Pager(config = PagingConfig(pageSize = 1)) {
 			CommentsPagingSource(
@@ -111,13 +125,17 @@ class CommentsViewModel @Inject constructor(
 			// Gross
 			uiState.value.let { state ->
 				_uiState.update { it.copy(commentCreateStatus = Status.Loading) }
-				if (state.post != null && state.activeUser != null && state.commentCreateForm != null) {
+				if (state.post != null && state.activeUser != null) {
 					commentRepository.postComment(
 						postId = state.post.id.toString(),
 						jwt = state.activeUser.key,
 						commentCreateForm = state.commentCreateForm
 					).onSuccess {
-						_uiState.update { it.copy(commentCreateStatus = Status.Success) }
+						_uiState.update { it.copy(
+							commentCreateStatus = Status.Success,
+							commentCreateForm = CommentCreateForm(content = ""),
+							commentRecipient = null
+						) }
 					}.onFailure {
 						_uiState.update { it.copy(commentCreateStatus = Status.Failure) }
 					}
@@ -129,8 +147,7 @@ class CommentsViewModel @Inject constructor(
 	}
 
 	fun editComment(comment: String) {
-		val commentForm = uiState.value.commentCreateForm?.copy(content = comment)
-			?: CommentCreateForm(content = comment)
+		val commentForm = uiState.value.commentCreateForm.copy(content = comment)
 		_uiState.update {
 			it.copy(
 				commentCreateForm = commentForm,
@@ -144,8 +161,9 @@ class CommentsViewModel @Inject constructor(
 		val post: Post? = null,
 		val comments: Flow<PagingData<Comment>> = flow { },
 		val commentRepliesStore: Map<String, List<CommentReplyPage>> = mutableMapOf(),
-		val commentCreateForm: CommentCreateForm? = null,
-		val commentCreateStatus: Status = Status.Neutral
+		val commentCreateForm: CommentCreateForm = CommentCreateForm(content = ""),
+		val commentCreateStatus: Status = Status.Neutral,
+		val commentRecipient: Comment? = null
 	)
 
 	companion object {
