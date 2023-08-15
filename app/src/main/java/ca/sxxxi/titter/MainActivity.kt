@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
 						navController = navController,
 //						startDestination = Screen.SearchScreen.route
 						startDestination = NavGroup.Authorization.route
-//						startDestination = Screen.Home.route
+//						startDestination = Screen.SearchScreen.route
 					) {
 						navigation(
 							route = NavGroup.Authorization.route,

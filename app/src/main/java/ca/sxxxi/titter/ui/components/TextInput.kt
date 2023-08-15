@@ -1,11 +1,14 @@
 package ca.sxxxi.titter.ui.components
 
+import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -15,9 +18,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,6 +54,72 @@ sealed class FieldValidationStatus(val color: Color = Color.Transparent) {
 }
 
 data class BorderColor(val focused: Color, val unfocused: Color)
+
+data class InputBorderColors(
+	val unfocusedColor: Color,
+	val focusedColor: Color,
+	val errorColor: Color,
+	val disabledColor: Color
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewInput(
+	modifier: Modifier = Modifier,
+	value: String,
+	onValueChange: (String) -> Unit,
+	trailingIcon: @Composable () -> Unit = {},
+	label: (@Composable () -> Unit)? = null,
+	borderColors: InputBorderColors = InputBorderColors(
+		unfocusedColor = MaterialTheme.colorScheme.surfaceVariant,
+		focusedColor = MaterialTheme.colorScheme.primary,
+		errorColor = MaterialTheme.colorScheme.error,
+		disabledColor = MaterialTheme.colorScheme.surface
+	),
+	singleLine: Boolean = true,
+	keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+	keyboardActions: KeyboardActions = KeyboardActions {},
+) {
+	val interactionSource = remember { MutableInteractionSource() }
+	val isFocused by interactionSource.collectIsFocusedAsState()
+	val inputShape by animateIntAsState(
+		targetValue = if (isFocused) 30 else 100,
+		animationSpec = spring(dampingRatio = 1f), label = ""
+	)
+	val borderColor = remember(isFocused) {
+		if (isFocused) borderColors.focusedColor
+		else borderColors.unfocusedColor
+	}
+
+	val shape = remember(inputShape) { RoundedCornerShape(inputShape) }
+
+	TextField(
+		modifier = Modifier
+			.fillMaxWidth()
+			.border(
+				width = 1.dp,
+				color = borderColor,
+				shape = shape
+			)
+			.then(modifier)
+		,
+		value = value,
+		onValueChange = onValueChange,
+		shape = shape,
+		colors = TextFieldDefaults.textFieldColors(
+			focusedIndicatorColor = Color.Transparent,
+			disabledIndicatorColor = Color.Transparent,
+			errorIndicatorColor = Color.Transparent,
+			unfocusedIndicatorColor = Color.Transparent
+		),
+		leadingIcon = trailingIcon,
+		label = label,
+		interactionSource = interactionSource,
+		singleLine = singleLine,
+		keyboardActions = keyboardActions,
+		keyboardOptions = keyboardOptions
+	)
+}
 
 @Composable
 fun TextInput(

@@ -80,7 +80,11 @@ fun PostCardWithoutButtons(
 				// Header
 				PostHeader(post = post)
 				// Content
-				Box(Modifier.padding(12.dp)) {
+				Box(
+					Modifier
+						.padding(horizontal = 16.dp)
+						.padding(top = 24.dp, bottom = 40.dp)
+				) {
 					Text(text = post.content)
 				}
 			}

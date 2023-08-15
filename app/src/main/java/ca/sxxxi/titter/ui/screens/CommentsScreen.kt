@@ -1,8 +1,7 @@
 package ca.sxxxi.titter.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
@@ -18,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -38,9 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -49,10 +48,7 @@ import ca.sxxxi.titter.data.models.Comment
 import ca.sxxxi.titter.data.models.CommentReplyPage
 import ca.sxxxi.titter.data.utils.states.Status
 import ca.sxxxi.titter.ui.components.IndentedItem
-import ca.sxxxi.titter.ui.components.PagedList
 import ca.sxxxi.titter.ui.components.PostCardWithoutButtons
-import ca.sxxxi.titter.ui.components.PullState
-import ca.sxxxi.titter.ui.components.RefreshableComponent
 import ca.sxxxi.titter.ui.components.RefreshablePagedList
 import ca.sxxxi.titter.ui.components.TextInput
 import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
@@ -67,6 +63,7 @@ fun CommentsScreen(
 	onCommentAdd: () -> Unit
 ) {
 	val comments = uiState.comments.collectAsLazyPagingItems()
+	val localFocusManager = LocalFocusManager.current
 
 	LaunchedEffect(key1 = uiState.commentCreateStatus) {
 		if (uiState.commentCreateStatus is Status.Success) {
@@ -76,7 +73,11 @@ fun CommentsScreen(
 	}
 
 	Column(
-		modifier = Modifier.fillMaxSize()
+		modifier = Modifier
+			.fillMaxSize()
+			.pointerInput(Unit) {
+				detectTapGestures { localFocusManager.clearFocus() }
+			},
 	) {
 		TopAppBar(
 			title = { Text(text = "Comments") },
@@ -182,6 +183,7 @@ private fun CommentsList(
 			is LoadState.Error -> {
 				snackBarHostState.showSnackbar("Having difficulties fetching post comments.")
 			}
+
 			else -> {}
 		}
 	}
@@ -243,6 +245,9 @@ fun CommentCard(comment: Comment) {
 			)
 			Spacer(modifier = Modifier.height(8.dp))
 			Text(text = comment.content)
+			TextButton(onClick = { /*TODO*/ }) {
+				Text(text = "Reply", style = MaterialTheme.typography.bodySmall)
+			}
 		}
 	}
 }

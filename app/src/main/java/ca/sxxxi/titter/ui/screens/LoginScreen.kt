@@ -1,6 +1,7 @@
 package ca.sxxxi.titter.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,12 +48,18 @@ fun LoginScreen(
 	onNavigateToSignup: () -> Unit = {},
 	onNavigateToHome: () -> Unit = {}
 ) {
+	val localFocusManager = LocalFocusManager.current
 	LaunchedEffect(key1 = Unit) {
 		checkUserIsLoggedIn()
 	}
 
 	Surface(
 		Modifier
+			.pointerInput(Unit) {
+				detectTapGestures {
+					localFocusManager.clearFocus()
+				}
+			}
 			.background(MaterialTheme.colorScheme.background)
 			.fillMaxSize()
 			.padding(horizontal = 16.dp)

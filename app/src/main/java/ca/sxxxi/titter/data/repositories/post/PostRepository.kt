@@ -1,16 +1,9 @@
 package ca.sxxxi.titter.data.repositories.post
 
-import android.util.Log
 import ca.sxxxi.titter.data.models.Post
 import ca.sxxxi.titter.data.network.models.PostNM
 import ca.sxxxi.titter.data.network.models.forms.PostCreateForm
 import ca.sxxxi.titter.data.network.models.responses.PagedResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import retrofit2.await
-import java.io.IOException
 
 interface PostRepository {
 	suspend fun getPostById(postId: String): Post?
