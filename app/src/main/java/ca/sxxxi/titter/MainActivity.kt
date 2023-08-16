@@ -5,6 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -103,9 +111,13 @@ class MainActivity : ComponentActivity() {
 				) {
 					NavHost(
 						navController = navController,
-//						startDestination = Screen.SearchScreen.route
-						startDestination = NavGroup.Authorization.route
-//						startDestination = Screen.SearchScreen.route
+						startDestination = NavGroup.Authorization.route,
+						enterTransition = {
+							  slideInHorizontally() + fadeIn()
+						},
+						exitTransition = {
+							slideOutHorizontally() + fadeOut()
+						}
 					) {
 						navigation(
 							route = NavGroup.Authorization.route,

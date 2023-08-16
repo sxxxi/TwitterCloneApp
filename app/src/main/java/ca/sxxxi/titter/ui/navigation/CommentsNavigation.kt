@@ -14,7 +14,7 @@ import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
 fun NavGraphBuilder.commentsScreen(onBackPressed: () -> Unit) {
 	composable(
 		route = Screen.CommentsScreen.routeWithArgs,
-		arguments = Screen.CommentsScreen.arguments
+		arguments = Screen.CommentsScreen.arguments,
 	) {
 		val commentsViewModel: CommentsViewModel = hiltViewModel()
 		val uiState by commentsViewModel.uiState.collectAsStateWithLifecycle()

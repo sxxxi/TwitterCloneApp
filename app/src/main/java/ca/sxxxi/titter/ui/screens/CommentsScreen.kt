@@ -1,5 +1,6 @@
 package ca.sxxxi.titter.ui.screens
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -21,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -43,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -62,7 +61,6 @@ import ca.sxxxi.titter.ui.components.IndentedItem
 import ca.sxxxi.titter.ui.components.NewInput
 import ca.sxxxi.titter.ui.components.PostCardWithoutButtons
 import ca.sxxxi.titter.ui.components.RefreshablePagedList
-import ca.sxxxi.titter.ui.components.TextInput
 import ca.sxxxi.titter.ui.viewmodels.CommentsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,6 +75,7 @@ fun CommentsScreen(
 ) {
 	val comments = uiState.comments.collectAsLazyPagingItems()
 	val localFocusManager = LocalFocusManager.current
+	val snackbarHostState = remember { SnackbarHostState() }
 
 	LaunchedEffect(key1 = uiState.commentCreateStatus) {
 		if (uiState.commentCreateStatus is Status.Success) {
@@ -92,37 +91,41 @@ fun CommentsScreen(
 				colors = TopAppBarDefaults.mediumTopAppBarColors(scrolledContainerColor = Color.Transparent),
 				navigationIcon = {
 					IconButton(onClick = onBackPressed) {
-						Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back button")
+						Icon(
+							imageVector = Icons.Default.ArrowBack,
+							contentDescription = "Back button"
+						)
 					}
 				}
 			)
-		}
+		},
+		snackbarHost = { SnackbarHost(snackbarHostState) }
 	) { pad ->
-		Column(
-			Modifier
-				.padding(pad)
-				.fillMaxSize()
-				.pointerInput(Unit) {
-					detectTapGestures { localFocusManager.clearFocus() }
-				},
-		) {
-			uiState.post?.let {
-				PostCardWithoutButtons(post = it)
-				Column(
-					modifier = Modifier
-						.fillMaxWidth()
-				) {
+		AnimatedContent(targetState = uiState.post, label = "") { post ->
+			val requester = remember { FocusRequester() }
+			Column(
+				Modifier
+					.fillMaxSize()
+					.padding(pad)
+					.pointerInput(Unit) {
+						detectTapGestures { localFocusManager.clearFocus() }
+					},
+			) {
+				post?.let {
+					PostCardWithoutButtons(post = it)
+//					Column(
+//						modifier = Modifier
+//							.fillMaxWidth()
+//					) {
+//						Divider()
+//						Text(
+//							modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
+//							text = "${comments.itemCount} Comments"
+//						)
+//					}
 					Divider()
-					Text(
-						modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
-						text = "${comments.itemCount} Comments"
-					)
-					Divider()
-				}
-				val requester = remember { FocusRequester() }
-				Column(modifier = Modifier.weight(1f)) {
 					CommentsList(
-						modifier = Modifier.height(50.dp),
+						modifier = Modifier.weight(1f),
 						comments = comments,
 						repliesStore = uiState.commentRepliesStore,
 						repliesLoader = { commentId ->
@@ -134,21 +137,22 @@ fun CommentsScreen(
 						},
 						onReplyRecipientChange = { recipientId ->
 							requester.requestFocus()
-							onReplyRecipientChange(recipientId )
+							onReplyRecipientChange(recipientId)
+						},
+						snackbarHostState = snackbarHostState
+					)
+					CommentTextBox(
+						modifier = Modifier.focusRequester(requester),
+						comment = uiState.commentCreateForm.content,
+						recipient = uiState.commentRecipient,
+						onCommentEdit = onCommentEdit,
+						onCommentAdd = onCommentAdd,
+						commentStatus = uiState.commentCreateStatus,
+						onReplyDismiss = {
+							onReplyRecipientChange(null)
 						}
 					)
 				}
-				CommentTextBox(
-					modifier = Modifier.focusRequester(requester),
-					comment = uiState.commentCreateForm.content,
-					recipient = uiState.commentRecipient,
-					onCommentEdit = onCommentEdit,
-					onCommentAdd = onCommentAdd,
-					commentStatus = uiState.commentCreateStatus,
-					onReplyDismiss = {
-						onReplyRecipientChange(null)
-					}
-				)
 			}
 		}
 	}
@@ -212,8 +216,7 @@ fun CommentTextBox(
 		Row(
 			modifier = Modifier
 				.padding(8.dp)
-				.then(modifier)
-			,
+				.then(modifier),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			NewInput(
@@ -232,14 +235,14 @@ fun CommentTextBox(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CommentsList(
 	modifier: Modifier = Modifier,
 	comments: LazyPagingItems<Comment>,
 	repliesStore: Map<String, List<CommentReplyPage>>,
 	repliesLoader: (String) -> Unit,
-	onReplyRecipientChange: (Comment) -> Unit
+	onReplyRecipientChange: (Comment) -> Unit,
+	snackbarHostState: SnackbarHostState?
 ) {
 	val snackBarHostState = remember { SnackbarHostState() }
 	val isRefreshing = remember(comments.loadState.refresh) {
@@ -249,20 +252,17 @@ private fun CommentsList(
 	LaunchedEffect(key1 = comments.loadState.refresh) {
 		when (comments.loadState.refresh) {
 			is LoadState.Error -> {
-				snackBarHostState.showSnackbar("Having difficulties fetching post comments.")
+				snackBarHostState.showSnackbar("Cannot fetch post comments.")
 			}
-
 			else -> {}
 		}
 	}
 
-	Scaffold(
-		snackbarHost = {
-			SnackbarHost(hostState = snackBarHostState)
-		}
-	) { scaffoldPadding ->
+	Column(
+		modifier = modifier,
+	) {
 		CommentsSection(
-			modifier = Modifier.padding(scaffoldPadding),
+//			modifier = modifier,
 			pagingData = comments,
 			onRefresh = { comments.refresh() },
 			repliesStore = repliesStore,
@@ -305,22 +305,24 @@ fun CommentCard(
 	comment: Comment,
 	onReplyRecipientChange: (Comment) -> Unit
 ) {
-	Box(modifier = Modifier.padding(vertical = 8.dp)) {
-		Column(
-			Modifier
-				.padding(start = 20.dp)
-				.padding(vertical = 12.dp)
-				.width(300.dp)
-		) {
-			Text(
-				text = "${comment.author.fName} ${comment.author.lName}",
-				fontWeight = FontWeight.Bold,
-				style = MaterialTheme.typography.bodySmall
-			)
-			Spacer(modifier = Modifier.height(8.dp))
-			Text(text = comment.content)
-			TextButton(onClick = { onReplyRecipientChange(comment) }) {
-				Text(text = "Reply", style = MaterialTheme.typography.bodySmall)
+	AnimatedContent(targetState = comment, label = "") { animComment ->
+		Box(modifier = Modifier.padding(vertical = 8.dp)) {
+			Column(
+				Modifier
+					.padding(start = 20.dp)
+					.padding(vertical = 12.dp)
+					.width(300.dp)
+			) {
+				Text(
+					text = "${animComment.author.fName} ${animComment.author.lName}",
+					fontWeight = FontWeight.Bold,
+					style = MaterialTheme.typography.bodySmall
+				)
+				Spacer(modifier = Modifier.height(8.dp))
+				Text(text = animComment.content)
+				TextButton(onClick = { onReplyRecipientChange(animComment) }) {
+					Text(text = "Reply", style = MaterialTheme.typography.bodySmall)
+				}
 			}
 		}
 	}

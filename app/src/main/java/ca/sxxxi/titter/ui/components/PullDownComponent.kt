@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,7 +42,7 @@ fun RefreshableComponent(
 ) {
 	val scope = CoroutineScope(Dispatchers.Default)
 	val hideOffset = remember { indicatorHeight.value }
-	var scrollVal by remember { mutableStateOf(0f) }
+	var scrollVal by remember { mutableFloatStateOf(0f) }
 	val refreshIndicatorOffset = remember(hideOffset, scrollVal) { scrollVal - hideOffset }
 	val animatedRefreshIndicator by animateFloatAsState(
 		targetValue = refreshIndicatorOffset,
